@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "802928415068",
+    "project_id": "newta-b7c253",
+    "storage_bucket": "newta-b7c253.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:802928415068:android:4eaf4dd7b666e35cdff199",
+        "android_client_info": {
+          "package_name": "com.example.tameramr"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "802928415068-d4mtduno42araf2jcbbj8484amvql73l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgYFBOHJDVAMMv6hHRuVV3ssnr7qVw9Ik"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "802928415068-d4mtduno42araf2jcbbj8484amvql73l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "802928415068-pkutpr19oq750skqsud7h343icn7153c.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.tameramr"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
