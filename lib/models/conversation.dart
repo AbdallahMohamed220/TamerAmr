@@ -2,80 +2,48 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/message.dart';
 
-class ConversationSnippet {
-  final String id;
-  final String conversationID;
-  final String lastMessage;
-  final String name;
-  final String image;
-  final MessageType type;
-  final int unseenCount;
-  final Timestamp timestamp;
-
-  ConversationSnippet(
-      {this.conversationID,
-      this.id,
-      this.lastMessage,
-      this.unseenCount,
-      this.timestamp,
-      this.name,
-      this.image,
-      this.type});
-
-  factory ConversationSnippet.fromFirestore(DocumentSnapshot _snapshot) {
-    var _data = _snapshot.data;
-    var _messageType = MessageType.Text;
-    if (_data()["type"] != null) {
-      switch (_data()["type"]) {
-        case "text":
-          break;
-        case "image":
-          _messageType = MessageType.Image;
-          break;
-        default:
-      }
-    }
-    return ConversationSnippet(
-      id: _snapshot.id,
-      conversationID: _data()["conversationID"],
-      lastMessage: _data()["lastMessage"] != null ? _data()["lastMessage"] : "",
-      unseenCount: _data()["unseenCount"],
-      timestamp: _data()["timestamp"] != null ? _data()["timestamp"] : null,
-      name: _data()["name"],
-      image: _data()["image"],
-      type: _messageType,
-    );
-  }
-}
-
 class Conversation {
   final String id;
-  final List members;
-  final List<Message> messages;
+  final String lastMessage;
   final String ownerID;
+  final String receiverID;
+  final MessageType messageType;
+  final int unseenOwnerCount;
+  final int unseenReceiverCount;
+  final Timestamp lastMessageTime;
 
-  Conversation({this.id, this.members, this.ownerID, this.messages});
+  Conversation({
+    this.id,
+    this.lastMessage,
+    this.ownerID,
+    this.receiverID,
+    this.messageType,
+    this.unseenOwnerCount,
+    this.unseenReceiverCount,
+    this.lastMessageTime,
+  });
 
-  factory Conversation.fromFirestore(DocumentSnapshot _snapshot) {
-    var _data = _snapshot.data;
-    List _messages = _data()["messages"];
-    if (_messages != null) {
-      _messages = _messages.map(
-        (_m) {
-          return Message(
-              type: _m["type"] == "text" ? MessageType.Text : MessageType.Image,
-              content: _m["message"],
-              timestamp: _m["timestamp"],
-              senderID: _m["senderID"]);
-        },
-      ).toList();
-    } else {
-      _messages = [];
+  factory Conversation.fromDocument(DocumentSnapshot doc) {
+    var messageType;
+    if (doc.data()["messageType"] != null) {
+      switch (doc.data()["messageType"]) {
+        case "text":
+          messageType = MessageType.text;
+          break;
+        case "image":
+          messageType = MessageType.image;
+          break;
+      }
     }
     return Conversation(
-        id: _snapshot.id,
-        members: _data()["members"],
-        ownerID: _data()["ownerID"],
-        messages: _messages);
+      id: doc.id,
+      lastMessage: doc.data()["lastMessage"] != null ? doc.data()["lastMessage"] : "",
+      ownerID: doc.data()["ownerID"],
+      receiverID: doc.data()["receiverID"],
+      messageType: messageType,
+      unseenOwnerCount: doc.data()["unseenOwnerCount"],
+      unseenReceiverCount: doc.data()["unseenReceiverCount"],
+      lastMessageTime: doc.data()["lastMessageTime"] != null ? doc.data()["lastMessageTime"] : null,
+    );
   }
 }

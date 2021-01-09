@@ -1,10 +1,13 @@
 import 'package:badges/badges.dart';
-import 'package:bubble/bubble.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
+import 'package:tamer_amr/models/message.dart';
 import 'package:tamer_amr/screens/checked_user_login/check_user_login.dart';
 import 'package:tamer_amr/screens/notification/notification.dart';
+import 'package:tamer_amr/screens/order_chat/component/messages_types_components/mine/mine_text_message_widget.dart';
+import 'package:tamer_amr/screens/order_chat/component/messages_types_components/other/other_text_message_widget.dart';
 
 // ignore: must_be_immutable
 class UserChatScreen extends StatefulWidget {
@@ -14,6 +17,7 @@ class UserChatScreen extends StatefulWidget {
   int price;
   int points;
   String createdAt;
+
   UserChatScreen({
     this.id,
     this.name,
@@ -28,9 +32,11 @@ class UserChatScreen extends StatefulWidget {
 }
 
 class _UserChatScreenState extends State<UserChatScreen> {
+  final ScrollController _listScrollController = ScrollController();
+  final TextEditingController _newMessageController = TextEditingController();
+
   double _containerHeight = 70;
-  KeyboardVisibilityNotification _keyboardVisibility =
-      new KeyboardVisibilityNotification();
+  KeyboardVisibilityNotification _keyboardVisibility = new KeyboardVisibilityNotification();
   int _keyboardVisibilitySubscriberId;
   bool _keyboardState;
 
@@ -74,6 +80,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                   width: deviceWidth,
                   height: deviceHeight,
                   child: ListView(
+                    controller: _listScrollController,
                     children: [
                       Column(
                         children: [
@@ -112,18 +119,15 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                   Container(
                                     margin: EdgeInsets.only(right: 15, top: 50),
                                     child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Text(
                                           widget.name,
                                           style: GoogleFonts.cairo(
                                             fontSize: 23,
                                             fontWeight: FontWeight.w600,
-                                            color:
-                                                Theme.of(context).accentColor,
+                                            color: Theme.of(context).accentColor,
                                           ),
                                         ),
                                       ],
@@ -147,8 +151,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                             'assets/icons/time-left.png',
                                             width: 18,
                                             height: 18,
-                                            color:
-                                                Theme.of(context).accentColor,
+                                            color: Theme.of(context).accentColor,
                                           ),
                                         ),
                                         Text(
@@ -156,8 +159,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                           style: GoogleFonts.cairo(
                                             fontSize: 22,
                                             fontWeight: FontWeight.w600,
-                                            color:
-                                                Theme.of(context).accentColor,
+                                            color: Theme.of(context).accentColor,
                                           ),
                                         ),
                                       ],
@@ -264,8 +266,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                 ),
                               ),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Container(
                                     alignment: Alignment.center,
@@ -299,91 +300,64 @@ class _UserChatScreenState extends State<UserChatScreen> {
                           ),
                         ],
                       ),
-                      Bubble(
-                        margin: BubbleEdges.only(top: 20, left: 20),
-                        alignment: Alignment.topLeft,
-                        nip: BubbleNip.leftTop,
-                        nipWidth: 20,
-                        nipHeight: 20,
-                        stick: true,
-                        elevation: 0,
-                        child: Container(
-                          alignment: Alignment.topRight,
-                          width: deviceWidth * 0.5,
-                          height: deviceWidth * 0.3,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
+                      OtherTextMessageWidget(
+                        message: Message(content: "العرض المقدم لتوصيل الطلب ${widget.price} ريال\n"),
+                      ),
+                      SizedBox(height: 20.0),
+                      StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection("messages")
+                              .doc("nPgE4tkCFamXAgYQQ1VG")
+                              .collection("messages")
+                              .orderBy("timestamp")
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData)
+                              return Center(child: CircularProgressIndicator());
+                            else if (snapshot.data.docs.isEmpty)
+                              return Center(
                                 child: Text(
-                                  "العرض المقدم لتوصيل الطلب ${widget.price} ريال\n",
-                                  textAlign: TextAlign.right,
+                                  "لا يوجد رسائل",
                                   style: GoogleFonts.cairo(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
                                     color: Theme.of(context).primaryColor,
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: Image.asset(
-                                  'assets/icons/check.png',
-                                  width: 10,
-                                  height: 10,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(
-                          left: 250,
-                        ),
-                        child: Bubble(
-                          margin: BubbleEdges.only(top: 20, right: 20),
-                          alignment: Alignment.topRight,
-                          nip: BubbleNip.rightTop,
-                          radius: Radius.circular(10.0),
-                          // nipWidth: 20,
-                          // nipHeight: 20,
-                          // nipRadius: 5.0,
-                          elevation: 0,
-                          color: Colors.blue,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
-                                child: Text(
-                                  "هذا الكلام مثال للنص",
-                                  textAlign: TextAlign.right,
-                                  style: GoogleFonts.cairo(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                ),
-                              ),
-                              Align(
-                                alignment: Alignment.topLeft,
-                                child: Icon(
-                                  Icons.done_all,
-                                  size: 18,
-                                  color: Theme.of(context).accentColor,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
+                              );
+                            else
+                              return Column(
+                                children: snapshot.data.docs.map<Widget>((doc) {
+                                  Message message = Message.fromDocument(doc);
+
+                                  // TODO: change this id to dynamic
+                                  // Provider.of<Users>(context, listen: false).uid
+                                  // OR
+                                  // FirebaseAuth.instance.currentUser.uid
+                                  if (message.senderID == "YRZaM0hs4xVobD0R7N69OctGQkJ2") {
+                                    switch (message.messageType) {
+                                      case MessageType.text:
+                                        return MineTextMessageWidget(
+                                          message: message,
+                                        );
+                                      case MessageType.image:
+                                        break;
+                                    }
+                                  } else {
+                                    _seenMessage(message);
+
+                                    switch (message.messageType) {
+                                      case MessageType.text:
+                                        return OtherTextMessageWidget(
+                                          message: message,
+                                        );
+                                      case MessageType.image:
+                                        break;
+                                    }
+                                  }
+                                }).toList(),
+                              );
+                          }),
                     ],
                   ),
                 ),
@@ -392,9 +366,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                   height: 75,
                   child: ClipRRect(
                     clipBehavior: Clip.antiAlias,
-                    borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(20.0),
-                        bottomRight: Radius.circular(20.0)),
+                    borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20.0), bottomRight: Radius.circular(20.0)),
                     child: AppBar(
                       backgroundColor: Color(0xff2190c2),
                       centerTitle: true,
@@ -425,8 +397,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                               SizedBox(width: 45),
                               InkWell(
                                 onTap: () {
-                                  Navigator.of(context).pushReplacementNamed(
-                                      NotificationScreen.routeName);
+                                  Navigator.of(context).pushReplacementNamed(NotificationScreen.routeName);
                                 },
                                 child: Badge(
                                   badgeContent: Text(
@@ -467,6 +438,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
               child: Row(
                 children: <Widget>[
                   InkWell(
+                    onTap: _sendMessage,
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8),
                       child: Image.asset(
@@ -484,16 +456,15 @@ class _UserChatScreenState extends State<UserChatScreen> {
                       left: 15,
                     ),
                     child: TextField(
+                      controller: _newMessageController,
                       onTap: () {},
                       textDirection: TextDirection.rtl,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: EdgeInsets.only(
-                            left: 15, bottom: 11, top: 11, right: 15),
+                        contentPadding: EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
                         enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.grey[400], width: 0.5),
+                          borderSide: BorderSide(color: Colors.grey[400], width: 0.5),
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         border: InputBorder.none,
@@ -535,5 +506,63 @@ class _UserChatScreenState extends State<UserChatScreen> {
         ],
       ),
     );
+  }
+
+  void _sendMessage() {
+    if (_newMessageController.text.isNotEmpty) {
+      FirebaseFirestore.instance.runTransaction((transaction) async {
+        Message message = Message(
+          senderID: "YRZaM0hs4xVobD0R7N69OctGQkJ2",
+          content: _newMessageController.text,
+          messageType: MessageType.text,
+          receiverSeen: false,
+          timestamp: Timestamp.now(),
+        );
+
+        DocumentReference docMessage =
+            FirebaseFirestore.instance.collection("messages").doc("nPgE4tkCFamXAgYQQ1VG").collection("messages").doc();
+
+        DocumentReference docConversation = FirebaseFirestore.instance.collection("messages").doc("nPgE4tkCFamXAgYQQ1VG");
+
+        transaction.set(docMessage, message.toJSON()).update(docConversation, {
+          "lastMessageTime": Timestamp.now(),
+          "messageType": message.messageType.toString().replaceAll("MessageType.", ""),
+          "lastMessage": message.content,
+          "unseenReceiverCount": FieldValue.increment(1),
+        });
+
+        _newMessageController.clear();
+        FocusScope.of(context).requestFocus(FocusNode());
+        _listScrollController.animateTo(
+          _listScrollController.position.maxScrollExtent,
+          duration: Duration(seconds: 1),
+          curve: Curves.fastOutSlowIn,
+        );
+      }).catchError((e) {
+        print(e);
+        return false;
+      });
+    }
+  }
+
+  void _seenMessage(Message message) {
+    FirebaseFirestore.instance.runTransaction((transaction) async {
+      DocumentReference docMessage = FirebaseFirestore.instance
+          .collection("messages")
+          .doc("nPgE4tkCFamXAgYQQ1VG")
+          .collection("messages")
+          .doc("${message.id}");
+
+      DocumentReference docConversation = FirebaseFirestore.instance.collection("messages").doc("nPgE4tkCFamXAgYQQ1VG");
+
+      transaction.update(docMessage, {
+        "receiverSeen": true,
+      }).update(docConversation, {
+        "unseenReceiverCount": 0,
+      });
+    }).catchError((e) {
+      print(e);
+      return false;
+    });
   }
 }
