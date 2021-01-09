@@ -42,9 +42,10 @@ class _OrdersChatScreenState extends State<OrdersChatScreen> {
       String userType = Provider.of<Users>(context, listen: false).userType;
 
       if (userType == 'مستخدم') {
-        Navigator.of(context).push(
+        Navigator.push(
+          context,
           MaterialPageRoute(
-            builder: (BuildContext context) => UserChatScreen(
+            builder: (context) => UserChatScreen(
               id: widget.id,
               name: widget.name,
               photo: widget.photo,
@@ -54,6 +55,18 @@ class _OrdersChatScreenState extends State<OrdersChatScreen> {
             ),
           ),
         );
+        // Navigator.of(context).push(
+        //   MaterialPageRoute(
+        //     builder: (BuildContext context) => UserChatScreen(
+        //       id: widget.id,
+        //       name: widget.name,
+        //       photo: widget.photo,
+        //       price: widget.price,
+        //       points: widget.points,
+        //       createdAt: widget.createdAt,
+        //     ),
+        //   ),
+        // );
       } else {
         Navigator.of(context).push(
           MaterialPageRoute(

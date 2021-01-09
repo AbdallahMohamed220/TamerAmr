@@ -3,6 +3,7 @@ import 'package:bubble/bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
+import 'package:tamer_amr/screens/checked_user_login/check_user_login.dart';
 import 'package:tamer_amr/screens/messages/messages.dart';
 import 'package:tamer_amr/screens/notification/notification.dart';
 
@@ -263,9 +264,6 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final _deviceWidth = MediaQuery.of(context).size.width;
-    final _deviceHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       backgroundColor: Color(0xffE1E1E1),
       body: Column(
@@ -275,8 +273,8 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
             child: Stack(
               children: [
                 Container(
-                  width: _deviceWidth,
-                  height: _deviceHeight,
+                  width: deviceWidth,
+                  height: deviceHeight,
                   child: ListView(
                     children: [
                       Column(
@@ -373,47 +371,11 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                           ),
                         ],
                       ),
-                      Bubble(
-                        margin: BubbleEdges.only(top: 20, left: 20),
-                        alignment: Alignment.topLeft,
-                        nip: BubbleNip.leftTop,
-                        nipWidth: 20,
-                        nipHeight: 20,
-                        stick: true,
-                        elevation: 0,
-                        child: Container(
-                          alignment: Alignment.topRight,
-                          width: _deviceWidth * 0.5,
-                          height: _deviceWidth * 0.3,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  "العرض المقدم لتوصيل الطلب       200  ريال",
-                                  textAlign: TextAlign.right,
-                                  style: GoogleFonts.cairo(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                ),
-                              ),
-                              Icon(Icons.done_all, size: 18, color: Colors.blue)
-                            ],
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
                 Container(
-                  width: _deviceWidth * 2.0,
+                  width: deviceWidth * 2.0,
                   height: 75,
                   child: ClipRRect(
                     clipBehavior: Clip.antiAlias,
@@ -442,7 +404,7 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                         Container(
                           margin: EdgeInsets.only(top: 8),
                           height: 50.0,
-                          width: _deviceWidth * 0.3,
+                          width: deviceWidth * 0.3,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
