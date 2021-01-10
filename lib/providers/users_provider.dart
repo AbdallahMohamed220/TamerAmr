@@ -199,22 +199,40 @@ class Users with ChangeNotifier {
           "password": password,
         },
       );
+      // print(email.trim());
+      // print(password.trim());
+      // UserCredential _result = await _auth.signInWithEmailAndPassword(
+      //     email: email, password: password);
+      // user = _result.user;
+
+      // print("user.uid");
+      // print(user.uid);
+      // uid = user.uid;
+      // print(uid);
+      try {
+        UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        user = userCredential.user;
+
+        print("user.uid");
+        print(user.uid);
+        uid = user.uid;
+        print(uid);
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'user-not-found') {
+          throw HttpException('No user found for that email.');
+        } else if (e.code == 'wrong-password') {
+          throw HttpException('Wrong password provided for that user.');
+        }
+      }
 
       final extractData = json.decode(response.body) as Map<String, dynamic>;
       if (extractData['code'] != 200) {
         throw HttpException(extractData['date'][0]);
       } else {
-        print(email.trim());
-        print(password.trim());
-        // UserCredential _result = await _auth.signInWithEmailAndPassword(
-        //     email: email.trim(), password: password.trim());
-        // user = _result.user;
-
-        // print("user.uid");
-        // print(user.uid);
-        // uid = user.uid;
-        // print(uid);
-
         id = extractData['data']['id'];
         print('id');
         print(id);

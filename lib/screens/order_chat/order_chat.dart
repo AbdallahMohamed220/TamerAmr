@@ -42,6 +42,8 @@ class _OrdersChatScreenState extends State<OrdersChatScreen> {
   tansactionHomePage() {
     Timer(Duration(seconds: 0), () async {
       String userType = Provider.of<Users>(context, listen: false).userType;
+      String uid = Provider.of<Users>(context, listen: false).uid;
+      print(uid);
 
       // TODO: all ids dynamic
       QuerySnapshot snapshot = await FirebaseFirestore.instance
