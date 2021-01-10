@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:tamer_amr/models/conversation.dart';
 import 'package:tamer_amr/screens/messages/component/user_message_item.dart';
 import 'package:tamer_amr/widgets/appbar.dart';
 import 'package:tamer_amr/widgets/bottom_navigation_widget.dart';
@@ -16,12 +19,37 @@ class MessagesScreen extends StatelessWidget {
         preferredSize: Size.fromHeight(55.0),
         child: AppBarWidget(),
       ),
-      body: ListView(
-        children: [
-          UserMessageItem(),
-          UserMessageItem(),
-        ],
-      ),
+      body: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection("messages")
+              .where("recipients", arrayContainsAny: [
+                "YRZaM0hs4xVobD0R7N69OctGQkJ2",
+                "OpE5Bd9skghe9Cr5zZHzcPAdPqd2",
+              ])
+              .orderBy("lastMessageTime")
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData)
+              return Center(child: CircularProgressIndicator());
+            else if (snapshot.data.docs.isEmpty)
+              return Center(
+                child: Text(
+                  "لا يوجد رسائل",
+                  style: GoogleFonts.cairo(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              );
+            else
+              return ListView(
+                children: snapshot.data.docs.map<Widget>((doc) {
+                  Conversation conversation = Conversation.fromDocument(doc);
+                  return UserMessageItem(conversation: conversation);
+                }).toList(),
+              );
+          }),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButtonWidget(
         floatActionColor: Color(0xff86BED5),

@@ -1,8 +1,35 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tamer_amr/models/conversation.dart';
 import 'package:tamer_amr/screens/order_chat/component/delevery_chat.dart';
 
-class UserMessageItem extends StatelessWidget {
+class UserMessageItem extends StatefulWidget {
+  final Conversation conversation;
+
+  const UserMessageItem({Key key, @required this.conversation}) : super(key: key);
+
+  @override
+  _UserMessageItemState createState() => _UserMessageItemState();
+}
+
+class _UserMessageItemState extends State<UserMessageItem> {
+  String _userName;
+
+  @override
+  void initState() {
+    super.initState();
+
+    String userID = widget.conversation.ownerID;
+    // TODO
+    if (userID == "YRZaM0hs4xVobD0R7N69OctGQkJ2") userID = widget.conversation.receiverID;
+    FirebaseFirestore.instance.collection("users").doc("$userID").get().then((doc) {
+      setState(() {
+        _userName = doc.data()["userName"];
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -11,7 +38,10 @@ class UserMessageItem extends StatelessWidget {
         onTap: () async {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (BuildContext context) => DelveryChatScreen(),
+              builder: (BuildContext context) => DelveryChatScreen(
+                conversation: widget.conversation,
+                userName: this._userName,
+              ),
             ),
           );
         },
@@ -48,14 +78,16 @@ class UserMessageItem extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text(
-                          'name',
-                          style: GoogleFonts.cairo(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
+                        (_userName == null)
+                            ? Center(child: CircularProgressIndicator())
+                            : Text(
+                                '$_userName',
+                                style: GoogleFonts.cairo(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context).accentColor,
+                                ),
+                              ),
                         Container(
                           child: Row(
                             children: [
@@ -71,7 +103,7 @@ class UserMessageItem extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                '00/00',
+                                '${widget.conversation.lastMessageTime.toDate()}',
                                 style: GoogleFonts.cairo(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w500,

@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tamer_amr/models/conversation.dart';
 import 'package:tamer_amr/providers/users_provider.dart';
 import 'package:tamer_amr/screens/order_chat/component/delevery_chat.dart';
 import 'package:tamer_amr/screens/order_chat/component/user_chat.dart';
@@ -38,14 +40,29 @@ class _OrdersChatScreenState extends State<OrdersChatScreen> {
   }
 
   tansactionHomePage() {
-    Timer(Duration(seconds: 0), () {
+    Timer(Duration(seconds: 0), () async {
       String userType = Provider.of<Users>(context, listen: false).userType;
+
+      // TODO: all ids dynamic
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection("messages")
+          .where("ownerID", isEqualTo: "YRZaM0hs4xVobD0R7N69OctGQkJ2")
+          .where("receiverID", isEqualTo: "OpE5Bd9skghe9Cr5zZHzcPAdPqd2")
+          .get();
+
+      Conversation conversation = Conversation();
+
+      if (snapshot.docs.isNotEmpty) {
+        conversation = Conversation.fromDocument(snapshot.docs.first);
+      }
 
       if (userType == 'مستخدم') {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => UserChatScreen(
+              conversation: conversation,
+              receiverID: "OpE5Bd9skghe9Cr5zZHzcPAdPqd2",
               id: widget.id,
               name: widget.name,
               photo: widget.photo,

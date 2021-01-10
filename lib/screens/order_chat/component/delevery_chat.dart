@@ -1,25 +1,33 @@
 import 'package:badges/badges.dart';
-import 'package:bubble/bubble.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
+import 'package:tamer_amr/models/conversation.dart';
+import 'package:tamer_amr/models/message.dart';
 import 'package:tamer_amr/screens/checked_user_login/check_user_login.dart';
 import 'package:tamer_amr/screens/messages/messages.dart';
 import 'package:tamer_amr/screens/notification/notification.dart';
+import 'package:tamer_amr/screens/order_chat/component/messages_types_components/mine/mine_text_message_widget.dart';
+import 'package:tamer_amr/screens/order_chat/component/messages_types_components/other/other_text_message_widget.dart';
 
 class DelveryChatScreen extends StatefulWidget {
   static const routeName = 'delevery_chat_screen';
+  final Conversation conversation;
+  final String userName;
 
-  const DelveryChatScreen({Key key}) : super(key: key);
+  const DelveryChatScreen({Key key, @required this.conversation, @required this.userName}) : super(key: key);
 
   @override
   _DelveryChatScreenState createState() => _DelveryChatScreenState();
 }
 
 class _DelveryChatScreenState extends State<DelveryChatScreen> {
+  final ScrollController _listScrollController = ScrollController();
+  final TextEditingController _newMessageController = TextEditingController();
+
   double _containerHeight = 70;
-  KeyboardVisibilityNotification _keyboardVisibility =
-      new KeyboardVisibilityNotification();
+  KeyboardVisibilityNotification _keyboardVisibility = new KeyboardVisibilityNotification();
   int _keyboardVisibilitySubscriberId;
   bool _keyboardState;
 
@@ -117,8 +125,7 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                       onChange: (value) {
                         setState(() {
                           double _salseCost = double.parse(value);
-                          double _charageCost =
-                              double.parse(_initialCharageCost);
+                          double _charageCost = double.parse(_initialCharageCost);
                           double _finalCost;
                           if (!value.isEmpty) {
                             _finalCost = _salseCost + _charageCost;
@@ -152,8 +159,7 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                             child: Row(
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.only(
-                                      right: 4.0, left: 5),
+                                  padding: const EdgeInsets.only(right: 4.0, left: 5),
                                   child: Text(
                                     'ر.س',
                                     style: GoogleFonts.cairo(
@@ -191,15 +197,12 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                                           color: Colors.white,
                                           width: 0.5,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(30.0),
+                                        borderRadius: BorderRadius.circular(30.0),
                                       ),
                                       border: InputBorder.none,
                                       focusedBorder: OutlineInputBorder(
-                                        borderSide:
-                                            BorderSide(color: Colors.white),
-                                        borderRadius:
-                                            BorderRadius.circular(30.0),
+                                        borderSide: BorderSide(color: Colors.white),
+                                        borderRadius: BorderRadius.circular(30.0),
                                       ),
                                     ),
                                   ),
@@ -276,6 +279,7 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                   width: deviceWidth,
                   height: deviceHeight,
                   child: ListView(
+                    controller: _listScrollController,
                     children: [
                       Column(
                         children: [
@@ -314,18 +318,15 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                                   Container(
                                     margin: EdgeInsets.only(right: 15, top: 50),
                                     child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Text(
-                                          'فيصل الشرارى',
+                                          '${widget.userName}',
                                           style: GoogleFonts.cairo(
                                             fontSize: 23,
                                             fontWeight: FontWeight.w600,
-                                            color:
-                                                Theme.of(context).accentColor,
+                                            color: Theme.of(context).accentColor,
                                           ),
                                         ),
                                       ],
@@ -349,8 +350,7 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                                             'assets/icons/time-left.png',
                                             width: 18,
                                             height: 18,
-                                            color:
-                                                Theme.of(context).accentColor,
+                                            color: Theme.of(context).accentColor,
                                           ),
                                         ),
                                         Text(
@@ -358,8 +358,7 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                                           style: GoogleFonts.cairo(
                                             fontSize: 22,
                                             fontWeight: FontWeight.w600,
-                                            color:
-                                                Theme.of(context).accentColor,
+                                            color: Theme.of(context).accentColor,
                                           ),
                                         ),
                                       ],
@@ -371,6 +370,64 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                           ),
                         ],
                       ),
+                      SizedBox(height: 20.0),
+                      StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection("messages")
+                              .doc("${widget.conversation.id}")
+                              .collection("messages")
+                              .orderBy("timestamp")
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData)
+                              return Center(child: CircularProgressIndicator());
+                            else if (snapshot.data.docs.isEmpty)
+                              return Center(
+                                child: Text(
+                                  "لا يوجد رسائل",
+                                  style: GoogleFonts.cairo(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                ),
+                              );
+                            else
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12.0),
+                                child: Column(
+                                  children: snapshot.data.docs.map<Widget>((doc) {
+                                    Message message = Message.fromDocument(doc);
+
+                                    // TODO: change this id to dynamic
+                                    // Provider.of<Users>(context, listen: false).uid
+                                    // OR
+                                    // FirebaseAuth.instance.currentUser.uid
+                                    if (message.senderID == "OpE5Bd9skghe9Cr5zZHzcPAdPqd2") {
+                                      switch (message.messageType) {
+                                        case MessageType.text:
+                                          return MineTextMessageWidget(
+                                            message: message,
+                                          );
+                                        case MessageType.image:
+                                          break;
+                                      }
+                                    } else {
+                                      _seenMessage(message);
+
+                                      switch (message.messageType) {
+                                        case MessageType.text:
+                                          return OtherTextMessageWidget(
+                                            message: message,
+                                          );
+                                        case MessageType.image:
+                                          break;
+                                      }
+                                    }
+                                  }).toList(),
+                                ),
+                              );
+                          }),
                     ],
                   ),
                 ),
@@ -379,9 +436,7 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                   height: 75,
                   child: ClipRRect(
                     clipBehavior: Clip.antiAlias,
-                    borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(20.0),
-                        bottomRight: Radius.circular(20.0)),
+                    borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20.0), bottomRight: Radius.circular(20.0)),
                     child: AppBar(
                       backgroundColor: Color(0xff2190c2),
                       centerTitle: true,
@@ -412,8 +467,7 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                               SizedBox(width: 45),
                               InkWell(
                                 onTap: () {
-                                  Navigator.of(context).pushReplacementNamed(
-                                      NotificationScreen.routeName);
+                                  Navigator.of(context).pushReplacementNamed(NotificationScreen.routeName);
                                 },
                                 child: Badge(
                                   badgeContent: Text(
@@ -435,8 +489,7 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                               SizedBox(width: 10),
                               InkWell(
                                 onTap: () {
-                                  Navigator.of(context).pushReplacementNamed(
-                                      MessagesScreen.routeName);
+                                  Navigator.of(context).pushReplacementNamed(MessagesScreen.routeName);
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.only(bottom: 6.0),
@@ -456,8 +509,7 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                                               style: GoogleFonts.cairo(
                                                 fontSize: 17,
                                                 fontWeight: FontWeight.w600,
-                                                color: Theme.of(context)
-                                                    .primaryColor,
+                                                color: Theme.of(context).primaryColor,
                                               ),
                                             ),
                                           ),
@@ -493,6 +545,7 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
               child: Row(
                 children: <Widget>[
                   InkWell(
+                    onTap: _sendMessage,
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8),
                       child: Image.asset(
@@ -510,16 +563,15 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                       left: 15,
                     ),
                     child: TextField(
+                      controller: _newMessageController,
                       onTap: () {},
                       textDirection: TextDirection.rtl,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: EdgeInsets.only(
-                            left: 15, bottom: 11, top: 11, right: 15),
+                        contentPadding: EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
                         enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.grey[400], width: 0.5),
+                          borderSide: BorderSide(color: Colors.grey[400], width: 0.5),
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         border: InputBorder.none,
@@ -578,6 +630,64 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
         ],
       ),
     );
+  }
+
+  void _sendMessage() {
+    if (_newMessageController.text.isNotEmpty) {
+      FirebaseFirestore.instance.runTransaction((transaction) async {
+        Message message = Message(
+          senderID: "OpE5Bd9skghe9Cr5zZHzcPAdPqd2",
+          content: _newMessageController.text,
+          messageType: MessageType.text,
+          receiverSeen: false,
+          timestamp: Timestamp.now(),
+        );
+
+        DocumentReference docMessage =
+            FirebaseFirestore.instance.collection("messages").doc("${widget.conversation.id}").collection("messages").doc();
+
+        DocumentReference docConversation = FirebaseFirestore.instance.collection("messages").doc("${widget.conversation.id}");
+
+        transaction.set(docMessage, message.toJSON()).update(docConversation, {
+          "lastMessageTime": Timestamp.now(),
+          "messageType": message.messageType.toString().replaceAll("MessageType.", ""),
+          "lastMessage": message.content,
+          "unseenOwnerCount": FieldValue.increment(1),
+        });
+
+        _newMessageController.clear();
+        FocusScope.of(context).requestFocus(FocusNode());
+        _listScrollController.animateTo(
+          _listScrollController.position.maxScrollExtent,
+          duration: Duration(seconds: 1),
+          curve: Curves.fastOutSlowIn,
+        );
+      }).catchError((e) {
+        print(e);
+        return false;
+      });
+    }
+  }
+
+  void _seenMessage(Message message) {
+    FirebaseFirestore.instance.runTransaction((transaction) async {
+      DocumentReference docMessage = FirebaseFirestore.instance
+          .collection("messages")
+          .doc("${widget.conversation.id}")
+          .collection("messages")
+          .doc("${message.id}");
+
+      DocumentReference docConversation = FirebaseFirestore.instance.collection("messages").doc("${widget.conversation.id}");
+
+      transaction.update(docMessage, {
+        "receiverSeen": true,
+      }).update(docConversation, {
+        "unseenReceiverCount": 0,
+      });
+    }).catchError((e) {
+      print(e);
+      return false;
+    });
   }
 }
 

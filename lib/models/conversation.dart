@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/message.dart';
 
 class Conversation {
-  final String id;
+  String id;
   final String lastMessage;
   final String ownerID;
   final String receiverID;
@@ -11,6 +11,7 @@ class Conversation {
   final int unseenOwnerCount;
   final int unseenReceiverCount;
   final Timestamp lastMessageTime;
+  final List<String> recipients;
 
   Conversation({
     this.id,
@@ -21,6 +22,7 @@ class Conversation {
     this.unseenOwnerCount,
     this.unseenReceiverCount,
     this.lastMessageTime,
+    this.recipients,
   });
 
   factory Conversation.fromDocument(DocumentSnapshot doc) {
@@ -44,6 +46,20 @@ class Conversation {
       unseenOwnerCount: doc.data()["unseenOwnerCount"],
       unseenReceiverCount: doc.data()["unseenReceiverCount"],
       lastMessageTime: doc.data()["lastMessageTime"] != null ? doc.data()["lastMessageTime"] : null,
+      recipients: List<String>.from(doc.data()["recipients"]),
     );
+  }
+
+  Map<String, dynamic> toJSON() {
+    return {
+      "lastMessage": lastMessage,
+      "ownerID": ownerID,
+      "receiverID": receiverID,
+      "receiverID": messageType.toString().replaceAll("MessageType.", ""),
+      "unseenOwnerCount": unseenOwnerCount,
+      "unseenReceiverCount": unseenReceiverCount,
+      "lastMessageTime": lastMessageTime,
+      "recipients": recipients,
+    };
   }
 }
