@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tamer_amr/screens/checked_user_login/check_user_login.dart';
 
 class FABBottomAppBarItem {
   FABBottomAppBarItem({this.iconImage, this.text});
@@ -11,8 +12,8 @@ class FABBottomAppBar extends StatefulWidget {
   FABBottomAppBar({
     this.items,
     this.centerItemText,
-    this.height: 60.0,
-    this.iconSize: 24.0,
+    this.height,
+    this.iconSize,
     this.backgroundColor,
     this.color,
     this.selectedColor,
@@ -111,10 +112,8 @@ class FABBottomAppBarState extends State<FABBottomAppBar> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Container(
-                  // margin: const EdgeInsets.only(left: 5),
-                  height: 77,
-                  width: 80,
-                  //padding: EdgeInsets.only(right: 15, left: 15),
+                  height: deviceHeight * 0.1,
+                  width: deviceWidth * 0.16,
                   decoration: BoxDecoration(
                       color: color,
                       borderRadius: BorderRadius.only(

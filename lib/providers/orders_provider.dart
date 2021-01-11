@@ -105,16 +105,15 @@ class Orders with ChangeNotifier {
         if (extractData == null) {
           return;
         }
-
-        for (int i = 0; i < extractData['data'].length; i++) {
+        for (int i = 0; i < extractData['data'][0].length; i++) {
           getOrders.add(
             OrderModel(
-              id: extractData['data'][i]['id'],
-              name: extractData['data'][i]['name'],
-              description: extractData['data'][i]['description'],
-              photo: extractData['data'][i]['photo'],
-              priceTo: extractData['data'][i]['price_to'],
-              createdAt: extractData['data'][i]['created_at'],
+              id: extractData['data'][0][i]['id'],
+              name: extractData['data'][0][i]['category_id']['name'],
+              description: extractData['data'][0][i]['description'],
+              photo: extractData['data'][0][i]['photo'],
+              priceTo: extractData['data'][0][i]['price_to'],
+              createdAt: extractData['data'][0][i]['created_at'],
             ),
           );
         }
@@ -142,15 +141,15 @@ class Orders with ChangeNotifier {
           return;
         }
 
-        for (int i = 0; i < extractData['data'].length; i++) {
+        for (int i = 0; i < extractData['data'][0].length; i++) {
           getOrders.add(
             OrderModel(
-              id: extractData['data'][i]['id'],
-              name: extractData['data'][i]['name'],
-              description: extractData['data'][i]['description'],
-              photo: extractData['data'][i]['photo'],
-              priceTo: extractData['data'][i]['price_to'],
-              createdAt: extractData['data'][i]['created_at'],
+              id: extractData['data'][0][i]['id'],
+              name: extractData['data'][0][i]['category_id']['name'],
+              description: extractData['data'][0][i]['description'],
+              photo: extractData['data'][0][i]['photo'],
+              priceTo: extractData['data'][0][i]['price_to'],
+              createdAt: extractData['data'][0][i]['created_at'],
             ),
           );
         }

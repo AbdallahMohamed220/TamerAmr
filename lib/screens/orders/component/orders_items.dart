@@ -24,16 +24,18 @@ class OrdersItems extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DateTime dateTimeCreatedAt =
-        DateTime.parse(orderDate.toString().substring(0, 10));
-    DateTime dateTimeNow = DateTime.now();
-    final differenceInDays = dateTimeNow.difference(dateTimeCreatedAt).inDays;
+    // DateTime dateTimeCreatedAt =
+    //     DateTime.parse(orderDate.toString().substring(0, 10));
+    // DateTime dateTimeNow = DateTime.now();
+    // final differenceInDays = dateTimeNow.difference(dateTimeCreatedAt).inDays;
     return Padding(
       padding: const EdgeInsets.only(top: 20.0, bottom: 20),
       child: Align(
         alignment: reverse ? Alignment.topRight : Alignment.topLeft,
         child: InkWell(
           onTap: () {
+            print(orderId);
+
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (BuildContext context) => OrdersDescriptionScreen(
@@ -95,8 +97,8 @@ class OrdersItems extends StatelessWidget {
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(right: 10.0),
-                                  child: Image.network(
-                                    imageUrl,
+                                  child: Image.asset(
+                                    'assets/icons/mark.jpg',
                                     width: 23,
                                     height: 23,
                                   ),
@@ -159,6 +161,10 @@ class OrdersItems extends StatelessWidget {
                                           color: Colors.white,
                                           borderRadius: BorderRadius.circular(
                                             25,
+                                          ),
+                                          image: DecorationImage(
+                                            image: NetworkImage(imageUrl),
+                                            fit: BoxFit.cover,
                                           ),
                                         ),
                                       ),
@@ -223,7 +229,7 @@ class OrdersItems extends StatelessWidget {
                         child: Row(
                           children: [
                             Text(
-                              'منذ $differenceInDays يوم' ?? "",
+                              orderDate,
                               style: GoogleFonts.cairo(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w500,
