@@ -31,7 +31,7 @@ class OrdersDescriptionScreen extends StatefulWidget {
 
 class _OrdersDescriptionScreenState extends State<OrdersDescriptionScreen> {
   bool _loadedInitData = true;
-  bool _isloading = true;
+  bool _isloading = false;
   var extractData;
   @override
   void didChangeDependencies() async {
@@ -78,7 +78,6 @@ class _OrdersDescriptionScreenState extends State<OrdersDescriptionScreen> {
   }
 
   String mapPreview;
-  bool _loadingMap = false;
 
   Future<void> _getCurrentUserLocation() async {
     try {
@@ -124,43 +123,23 @@ class _OrdersDescriptionScreenState extends State<OrdersDescriptionScreen> {
                           height: deviceWidth * 0.63,
                           child: Stack(
                             children: [
-                              _loadingMap
-                                  ? Container(
-                                      margin: EdgeInsets.only(top: 2),
-                                      width: deviceWidth,
-                                      height: deviceWidth * .65,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.only(
-                                          bottomLeft: Radius.circular(15),
-                                          bottomRight: Radius.circular(15),
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: CircularProgressIndicator(
-                                          backgroundColor:
-                                              Theme.of(context).hoverColor,
-                                        ),
-                                      ),
-                                    )
-                                  : Container(
-                                      margin: EdgeInsets.only(top: 2),
-                                      width: deviceWidth,
-                                      height: deviceWidth * .65,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[400],
-                                        borderRadius: BorderRadius.only(
-                                          bottomLeft: Radius.circular(15),
-                                          bottomRight: Radius.circular(15),
-                                        ),
-                                        image: DecorationImage(
-                                          fit: BoxFit.cover,
-                                          image: NetworkImage(mapPreview),
-                                        ),
-                                      ),
-                                    )
+                              Container(
+                                margin: EdgeInsets.only(top: 2),
+                                width: deviceWidth,
+                                height: deviceWidth * .65,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[400],
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(15),
+                                    bottomRight: Radius.circular(15),
+                                  ),
+                                  image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: NetworkImage(mapPreview),
+                                  ),
+                                ),
+                              )
                             ],
                           ),
                         ),
@@ -279,7 +258,7 @@ class _OrdersDescriptionScreenState extends State<OrdersDescriptionScreen> {
                               height: deviceWidth * 0.15,
                               child: FittedBox(
                                 child: Padding(
-                                  padding: const EdgeInsets.only(right: 8.0),
+                                  padding: const EdgeInsets.only(right: 20.0),
                                   child: Text(
                                     extractData['data']['description'],
                                     style: GoogleFonts.cairo(
@@ -357,13 +336,10 @@ class _OrdersDescriptionScreenState extends State<OrdersDescriptionScreen> {
                                 borderRadius: BorderRadius.circular(
                                   20,
                                 ),
-                              ),
-                              child: Center(
-                                child: Image.network(
-                                  extractData['data']['photo'],
-                                  width: 200,
-                                  height: 150,
-                                  color: Colors.grey[300],
+                                image: DecorationImage(
+                                  image: NetworkImage(
+                                      extractData['data']['photo']),
+                                  fit: BoxFit.fill,
                                 ),
                               ),
                             ),

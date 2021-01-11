@@ -5,6 +5,7 @@ import 'package:tamer_amr/screens/more/more.dart';
 import 'package:tamer_amr/screens/orders/orders.dart';
 import 'package:tamer_amr/screens/shops/shops.dart';
 import 'package:tamer_amr/widgets/bottom_navigation.dart';
+import 'package:tamer_amr/screens/checked_user_login/check_user_login.dart';
 
 // ignore: must_be_immutable
 class BottomNavigationWidget extends StatefulWidget {
@@ -26,7 +27,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
   Widget build(BuildContext context) {
     return FABBottomAppBar(
       selectedIndex: widget.selectedTab,
-      height: 77,
+      height: deviceHeight * 0.1,
       centerItemText: '',
       color: Color(0xffEBEBEB),
       backgroundColor: Color(0xffEBEBEB),
@@ -87,12 +88,12 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
             padding: const EdgeInsets.only(top: 15.0),
             child: Image.asset(
               'assets/icons/more_black.png',
-              width: 30,
-              height: 30,
+              width: deviceWidth * 0.05,
+              height: deviceWidth * 0.06,
             ),
           ),
           text: Container(
-            margin: EdgeInsets.only(top: 6),
+            margin: EdgeInsets.only(top: 8),
             child: Text(
               'المزيد',
               textAlign: TextAlign.center,
@@ -106,15 +107,17 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
         ),
         FABBottomAppBarItem(
           iconImage: Container(
-              margin: EdgeInsets.only(top: 16, right: 5, left: 5),
-              width: 35,
-              height: 28,
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/icons/avatar_black.png')))),
+            margin: EdgeInsets.only(top: 16, right: 5, left: 5),
+            width: deviceWidth * 0.05,
+            height: deviceWidth * 0.06,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/icons/avatar_black.png'),
+              ),
+            ),
+          ),
           text: Container(
             margin: EdgeInsets.only(right: 6, left: 4, top: 5),
-            width: 50,
             child: Text(
               'إشتراكى',
               textAlign: TextAlign.center,
@@ -128,15 +131,23 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
         ),
         FABBottomAppBarItem(
           iconImage: Container(
-              margin: EdgeInsets.only(top: 15, right: 5, left: 5),
-              width: 35,
-              height: 35,
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/icons/shop_black.png')))),
-          text: Container(
-            margin: EdgeInsets.only(left: 8, right: 5, top: 4),
-            child: FittedBox(
+            margin: EdgeInsets.only(
+              top: 15,
+              right: 5,
+              left: 5,
+              bottom: 3,
+            ),
+            width: deviceWidth * 0.07,
+            height: deviceWidth * 0.07,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/icons/shop_black.png'),
+              ),
+            ),
+          ),
+          text: FittedBox(
+            child: Padding(
+              padding: const EdgeInsets.all(15),
               child: Text(
                 'المتاجر القريبة',
                 textAlign: TextAlign.center,
@@ -151,11 +162,17 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
         ),
         FABBottomAppBarItem(
           iconImage: Container(
-              margin: EdgeInsets.only(right: 5, top: 15),
-              height: 30,
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/icons/order_black.png')))),
+            margin: EdgeInsets.only(right: 5, top: 20),
+            width: deviceWidth * 0.07,
+            height: deviceWidth * 0.06,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(
+                  'assets/icons/order_black.png',
+                ),
+              ),
+            ),
+          ),
           text: Container(
             margin: EdgeInsets.only(right: 5, top: 4),
             child: Text(
