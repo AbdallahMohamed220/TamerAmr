@@ -1,5 +1,6 @@
 import 'package:badges/badges.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
@@ -8,7 +9,9 @@ import 'package:tamer_amr/models/message.dart';
 import 'package:tamer_amr/screens/checked_user_login/check_user_login.dart';
 import 'package:tamer_amr/screens/messages/messages.dart';
 import 'package:tamer_amr/screens/notification/notification.dart';
+import 'package:tamer_amr/screens/order_chat/component/messages_types_components/mine/mine_image_message_widget.dart';
 import 'package:tamer_amr/screens/order_chat/component/messages_types_components/mine/mine_text_message_widget.dart';
+import 'package:tamer_amr/screens/order_chat/component/messages_types_components/other/other_image_message_widget.dart';
 import 'package:tamer_amr/screens/order_chat/component/messages_types_components/other/other_text_message_widget.dart';
 
 class DelveryChatScreen extends StatefulWidget {
@@ -63,6 +66,7 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
   TextEditingController _finalCostController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String _initialCharageCost = '25.0';
+
   Future<void> showInformationDialog(BuildContext context) async {
     return await showDialog(
         context: context,
@@ -373,7 +377,7 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                       SizedBox(height: 20.0),
                       StreamBuilder(
                           stream: FirebaseFirestore.instance
-                              .collection("messages")
+                              .collection("conversations")
                               .doc("${widget.conversation.id}")
                               .collection("messages")
                               .orderBy("timestamp")
@@ -399,17 +403,16 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                                   children: snapshot.data.docs.map<Widget>((doc) {
                                     Message message = Message.fromDocument(doc);
 
-                                    // TODO: change this id to dynamic
-                                    // Provider.of<Users>(context, listen: false).uid
-                                    // OR
-                                    // FirebaseAuth.instance.currentUser.uid
-                                    if (message.senderID == "OpE5Bd9skghe9Cr5zZHzcPAdPqd2") {
+                                    if (message.senderID == FirebaseAuth.instance.currentUser.uid) {
                                       switch (message.messageType) {
                                         case MessageType.text:
                                           return MineTextMessageWidget(
                                             message: message,
                                           );
                                         case MessageType.image:
+                                          return MineImageMessageWidget(
+                                            message: message,
+                                          );
                                           break;
                                       }
                                     } else {
@@ -421,6 +424,9 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
                                             message: message,
                                           );
                                         case MessageType.image:
+                                          return OtherImageMessageWidget(
+                                            message: message,
+                                          );
                                           break;
                                       }
                                     }
@@ -636,7 +642,7 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
     if (_newMessageController.text.isNotEmpty) {
       FirebaseFirestore.instance.runTransaction((transaction) async {
         Message message = Message(
-          senderID: "OpE5Bd9skghe9Cr5zZHzcPAdPqd2",
+          senderID: "${FirebaseAuth.instance.currentUser.uid}",
           content: _newMessageController.text,
           messageType: MessageType.text,
           receiverSeen: false,
@@ -644,15 +650,22 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
         );
 
         DocumentReference docMessage =
-            FirebaseFirestore.instance.collection("messages").doc("${widget.conversation.id}").collection("messages").doc();
+            FirebaseFirestore.instance.collection("conversations").doc("${widget.conversation.id}").collection("messages").doc();
 
-        DocumentReference docConversation = FirebaseFirestore.instance.collection("messages").doc("${widget.conversation.id}");
+        DocumentReference docConversation =
+            FirebaseFirestore.instance.collection("conversations").doc("${widget.conversation.id}");
+
+        String unSeenFieldName;
+        if (widget.conversation.ownerID != FirebaseAuth.instance.currentUser.uid)
+          unSeenFieldName = "unseenOwnerCount";
+        else
+          unSeenFieldName = "unseenReceiverCount";
 
         transaction.set(docMessage, message.toJSON()).update(docConversation, {
           "lastMessageTime": Timestamp.now(),
           "messageType": message.messageType.toString().replaceAll("MessageType.", ""),
           "lastMessage": message.content,
-          "unseenOwnerCount": FieldValue.increment(1),
+          "$unSeenFieldName": FieldValue.increment(1),
         });
 
         _newMessageController.clear();
@@ -672,17 +685,23 @@ class _DelveryChatScreenState extends State<DelveryChatScreen> {
   void _seenMessage(Message message) {
     FirebaseFirestore.instance.runTransaction((transaction) async {
       DocumentReference docMessage = FirebaseFirestore.instance
-          .collection("messages")
+          .collection("conversations")
           .doc("${widget.conversation.id}")
           .collection("messages")
           .doc("${message.id}");
 
-      DocumentReference docConversation = FirebaseFirestore.instance.collection("messages").doc("${widget.conversation.id}");
+      DocumentReference docConversation = FirebaseFirestore.instance.collection("conversations").doc("${widget.conversation.id}");
+
+      String unSeenFieldName;
+      if (widget.conversation.ownerID == FirebaseAuth.instance.currentUser.uid)
+        unSeenFieldName = "unseenOwnerCount";
+      else
+        unSeenFieldName = "unseenReceiverCount";
 
       transaction.update(docMessage, {
         "receiverSeen": true,
       }).update(docConversation, {
-        "unseenReceiverCount": 0,
+        "$unSeenFieldName": 0,
       });
     }).catchError((e) {
       print(e);
@@ -704,6 +723,7 @@ class BillInputs extends StatelessWidget {
     this.readOnly,
     this.onChange,
   });
+
   @override
   Widget build(BuildContext context) {
     return Container(

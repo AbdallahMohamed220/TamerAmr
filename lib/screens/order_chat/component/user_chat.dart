@@ -1,12 +1,19 @@
+import 'dart:io';
+
 import 'package:badges/badges.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tamer_amr/models/conversation.dart';
 import 'package:tamer_amr/models/message.dart';
 import 'package:tamer_amr/screens/checked_user_login/check_user_login.dart';
 import 'package:tamer_amr/screens/notification/notification.dart';
+import 'package:tamer_amr/screens/order_chat/component/messages_types_components/mine/mine_image_message_widget.dart';
 import 'package:tamer_amr/screens/order_chat/component/messages_types_components/mine/mine_text_message_widget.dart';
+import 'package:tamer_amr/screens/order_chat/component/messages_types_components/other/other_image_message_widget.dart';
 import 'package:tamer_amr/screens/order_chat/component/messages_types_components/other/other_text_message_widget.dart';
 
 // ignore: must_be_immutable
@@ -317,7 +324,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                       SizedBox(height: 20.0),
                       StreamBuilder(
                           stream: FirebaseFirestore.instance
-                              .collection("messages")
+                              .collection("conversations")
                               .doc("${_conversation.id}")
                               .collection("messages")
                               .orderBy("timestamp")
@@ -343,17 +350,16 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                   children: snapshot.data.docs.map<Widget>((doc) {
                                     Message message = Message.fromDocument(doc);
 
-                                    // TODO: change this id to dynamic
-                                    // Provider.of<Users>(context, listen: false).uid
-                                    // OR
-                                    // FirebaseAuth.instance.currentUser.uid
-                                    if (message.senderID == "YRZaM0hs4xVobD0R7N69OctGQkJ2") {
+                                    if (message.senderID == FirebaseAuth.instance.currentUser.uid) {
                                       switch (message.messageType) {
                                         case MessageType.text:
                                           return MineTextMessageWidget(
                                             message: message,
                                           );
                                         case MessageType.image:
+                                          return MineImageMessageWidget(
+                                            message: message,
+                                          );
                                           break;
                                       }
                                     } else {
@@ -365,6 +371,9 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                             message: message,
                                           );
                                         case MessageType.image:
+                                          return OtherImageMessageWidget(
+                                            message: message,
+                                          );
                                           break;
                                       }
                                     }
@@ -453,7 +462,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
               child: Row(
                 children: <Widget>[
                   InkWell(
-                    onTap: _sendMessage,
+                    onTap: _sendTextMessage,
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8),
                       child: Image.asset(
@@ -494,6 +503,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                     ),
                   ),
                   InkWell(
+                    onTap: _pickImage,
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: Image.asset(
@@ -523,9 +533,9 @@ class _UserChatScreenState extends State<UserChatScreen> {
     );
   }
 
-  void _sendMessage() async {
+  void _sendTextMessage() async {
     Message message = Message(
-      senderID: "YRZaM0hs4xVobD0R7N69OctGQkJ2",
+      senderID: "${FirebaseAuth.instance.currentUser.uid}",
       content: _newMessageController.text,
       messageType: MessageType.text,
       receiverSeen: false,
@@ -534,16 +544,17 @@ class _UserChatScreenState extends State<UserChatScreen> {
 
     if (_conversation.id == null) {
       Conversation newConversation = Conversation(
-        ownerID: "YRZaM0hs4xVobD0R7N69OctGQkJ2",
+        ownerID: "${FirebaseAuth.instance.currentUser.uid}",
         receiverID: "${widget.receiverID}",
+        recipients: ["${FirebaseAuth.instance.currentUser.uid}", "${widget.receiverID}"],
         lastMessageTime: Timestamp.now(),
         messageType: message.messageType,
         lastMessage: message.content,
-        unseenReceiverCount: 1,
+        unseenReceiverCount: 0,
         unseenOwnerCount: 0,
       );
 
-      DocumentReference docConversation = FirebaseFirestore.instance.collection("messages").doc();
+      DocumentReference docConversation = FirebaseFirestore.instance.collection("conversations").doc();
 
       newConversation.id = docConversation.id;
 
@@ -557,15 +568,21 @@ class _UserChatScreenState extends State<UserChatScreen> {
     if (_newMessageController.text.isNotEmpty) {
       FirebaseFirestore.instance.runTransaction((transaction) async {
         DocumentReference docMessage =
-            FirebaseFirestore.instance.collection("messages").doc("${_conversation.id}").collection("messages").doc();
+            FirebaseFirestore.instance.collection("conversations").doc("${_conversation.id}").collection("messages").doc();
 
-        DocumentReference docConversation = FirebaseFirestore.instance.collection("messages").doc("${_conversation.id}");
+        DocumentReference docConversation = FirebaseFirestore.instance.collection("conversations").doc("${_conversation.id}");
+
+        String unSeenFieldName;
+        if (_conversation.ownerID != FirebaseAuth.instance.currentUser.uid)
+          unSeenFieldName = "unseenOwnerCount";
+        else
+          unSeenFieldName = "unseenReceiverCount";
 
         transaction.set(docMessage, message.toJSON()).update(docConversation, {
           "lastMessageTime": Timestamp.now(),
           "messageType": message.messageType.toString().replaceAll("MessageType.", ""),
           "lastMessage": message.content,
-          "unseenReceiverCount": FieldValue.increment(1),
+          "$unSeenFieldName": FieldValue.increment(1),
         });
 
         _newMessageController.clear();
@@ -585,21 +602,141 @@ class _UserChatScreenState extends State<UserChatScreen> {
   void _seenMessage(Message message) {
     FirebaseFirestore.instance.runTransaction((transaction) async {
       DocumentReference docMessage = FirebaseFirestore.instance
-          .collection("messages")
+          .collection("conversations")
           .doc("${_conversation.id}")
           .collection("messages")
           .doc("${message.id}");
 
-      DocumentReference docConversation = FirebaseFirestore.instance.collection("messages").doc("${_conversation.id}");
+      DocumentReference docConversation = FirebaseFirestore.instance.collection("conversations").doc("${_conversation.id}");
+
+      String unSeenFieldName;
+      if (_conversation.ownerID == FirebaseAuth.instance.currentUser.uid)
+        unSeenFieldName = "unseenOwnerCount";
+      else
+        unSeenFieldName = "unseenReceiverCount";
 
       transaction.update(docMessage, {
         "receiverSeen": true,
       }).update(docConversation, {
-        "unseenOwnerCount": 0,
+        "$unSeenFieldName": 0,
       });
     }).catchError((e) {
       print(e);
       return false;
     });
+  }
+
+  Future<void> _pickImage() async {
+    FilePickerResult result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      allowCompression: true,
+      type: FileType.image,
+    );
+
+    if (result != null) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return WillPopScope(
+            onWillPop: () async => false,
+            child: AlertDialog(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  CircularProgressIndicator(valueColor: new AlwaysStoppedAnimation<Color>(Colors.blue),),
+                  SizedBox(height: 20.0),
+                  Text(
+                    "جاري رفع الصورة",
+                    style: GoogleFonts.cairo(fontSize: 32),
+                    textAlign: TextAlign.center,
+                  )
+                ],
+              ),
+            ),
+          );
+        },
+      );
+
+      String url = await _uploadImage(result.files.first);
+
+      Message message = Message(
+        senderID: "${FirebaseAuth.instance.currentUser.uid}",
+        content: url,
+        messageType: MessageType.image,
+        receiverSeen: false,
+        timestamp: Timestamp.now(),
+      );
+
+      if (_conversation.id == null) {
+        Conversation newConversation = Conversation(
+          ownerID: "${FirebaseAuth.instance.currentUser.uid}",
+          receiverID: "${widget.receiverID}",
+          recipients: ["${FirebaseAuth.instance.currentUser.uid}", "${widget.receiverID}"],
+          lastMessageTime: Timestamp.now(),
+          messageType: message.messageType,
+          lastMessage: message.content,
+          unseenReceiverCount: 0,
+          unseenOwnerCount: 0,
+        );
+
+        DocumentReference docConversation = FirebaseFirestore.instance.collection("conversations").doc();
+
+        newConversation.id = docConversation.id;
+
+        await docConversation.set(newConversation.toJSON());
+
+        setState(() {
+          _conversation = newConversation;
+        });
+      }
+
+      FirebaseFirestore.instance.runTransaction((transaction) async {
+        DocumentReference docMessage =
+        FirebaseFirestore.instance.collection("conversations").doc("${_conversation.id}").collection("messages").doc();
+
+        DocumentReference docConversation = FirebaseFirestore.instance.collection("conversations").doc("${_conversation.id}");
+
+        String unSeenFieldName;
+        if (_conversation.ownerID != FirebaseAuth.instance.currentUser.uid)
+          unSeenFieldName = "unseenOwnerCount";
+        else
+          unSeenFieldName = "unseenReceiverCount";
+
+        transaction.set(docMessage, message.toJSON()).update(docConversation, {
+          "lastMessageTime": Timestamp.now(),
+          "messageType": message.messageType.toString().replaceAll("MessageType.", ""),
+          "lastMessage": message.content,
+          "$unSeenFieldName": FieldValue.increment(1),
+        });
+
+        Navigator.pop(context);
+        _listScrollController.animateTo(
+          _listScrollController.position.maxScrollExtent,
+          duration: Duration(seconds: 1),
+          curve: Curves.fastOutSlowIn,
+        );
+      }).catchError((e) {
+        print(e);
+        return false;
+      });
+    }
+  }
+
+  Future<String> _uploadImage(PlatformFile file) async {
+    String timestampId;
+    Reference reference;
+    UploadTask uploadTask;
+    TaskSnapshot storageTaskSnapshot;
+
+    timestampId = DateTime.now().millisecondsSinceEpoch.toString();
+    reference = FirebaseStorage.instance.ref().child("conversations/${_conversation.id}/$timestampId");
+    uploadTask = reference.putFile(File(file.path));
+    storageTaskSnapshot = await uploadTask;
+    String imageUrl = await storageTaskSnapshot.ref.getDownloadURL();
+
+    return imageUrl;
   }
 }

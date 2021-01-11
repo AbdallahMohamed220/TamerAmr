@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tamer_amr/models/conversation.dart';
@@ -45,11 +46,20 @@ class _OrdersChatScreenState extends State<OrdersChatScreen> {
       String uid = Provider.of<Users>(context, listen: false).uid;
       print(uid);
 
-      // TODO: all ids dynamic
+      // TODO: email dynamic
+      String deliveryEmail = "Delivery@gmail.com";
+
+      QuerySnapshot usersSnapshot =
+          await FirebaseFirestore.instance.collection("users").where("userEmail", isEqualTo: "$deliveryEmail").get();
+
+      if (usersSnapshot.docs.isEmpty) return;
+
+      String receiverID = usersSnapshot.docs.first.id;
+
       QuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection("messages")
-          .where("ownerID", isEqualTo: "YRZaM0hs4xVobD0R7N69OctGQkJ2")
-          .where("receiverID", isEqualTo: "OpE5Bd9skghe9Cr5zZHzcPAdPqd2")
+          .collection("conversations")
+          .where("ownerID", isEqualTo: "${FirebaseAuth.instance.currentUser.uid}")
+          .where("receiverID", isEqualTo: "$receiverID")
           .get();
 
       Conversation conversation = Conversation();
@@ -64,7 +74,7 @@ class _OrdersChatScreenState extends State<OrdersChatScreen> {
           MaterialPageRoute(
             builder: (context) => UserChatScreen(
               conversation: conversation,
-              receiverID: "OpE5Bd9skghe9Cr5zZHzcPAdPqd2",
+              receiverID: "$receiverID",
               id: widget.id,
               name: widget.name,
               photo: widget.photo,

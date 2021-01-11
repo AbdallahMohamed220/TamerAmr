@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tamer_amr/models/conversation.dart';
@@ -21,8 +22,8 @@ class _UserMessageItemState extends State<UserMessageItem> {
     super.initState();
 
     String userID = widget.conversation.ownerID;
-    // TODO
-    if (userID == "YRZaM0hs4xVobD0R7N69OctGQkJ2") userID = widget.conversation.receiverID;
+
+    if (userID == FirebaseAuth.instance.currentUser.uid) userID = widget.conversation.receiverID;
     FirebaseFirestore.instance.collection("users").doc("$userID").get().then((doc) {
       setState(() {
         _userName = doc.data()["userName"];

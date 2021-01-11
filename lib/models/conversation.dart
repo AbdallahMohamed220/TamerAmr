@@ -55,7 +55,7 @@ class Conversation {
       "lastMessage": lastMessage,
       "ownerID": ownerID,
       "receiverID": receiverID,
-      "receiverID": messageType.toString().replaceAll("MessageType.", ""),
+      "messageType": messageType.toString().replaceAll("MessageType.", ""),
       "unseenOwnerCount": unseenOwnerCount,
       "unseenReceiverCount": unseenReceiverCount,
       "lastMessageTime": lastMessageTime,
