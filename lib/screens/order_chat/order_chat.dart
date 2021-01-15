@@ -18,6 +18,7 @@ class OrdersChatScreen extends StatefulWidget {
   int price;
   int points;
   String createdAt;
+  String deleveryEmail;
 
   OrdersChatScreen({
     this.id,
@@ -26,6 +27,7 @@ class OrdersChatScreen extends StatefulWidget {
     this.price,
     this.createdAt,
     this.points,
+    this.deleveryEmail,
   });
 
   @override
@@ -47,10 +49,12 @@ class _OrdersChatScreenState extends State<OrdersChatScreen> {
       print(uid);
 
       // TODO: email dynamic
-      String deliveryEmail = "Delivery@gmail.com";
+      String deliveryEmail = widget.deleveryEmail;
 
-      QuerySnapshot usersSnapshot =
-          await FirebaseFirestore.instance.collection("users").where("userEmail", isEqualTo: "$deliveryEmail").get();
+      QuerySnapshot usersSnapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .where("userEmail", isEqualTo: "$deliveryEmail")
+          .get();
 
       if (usersSnapshot.docs.isEmpty) return;
 
@@ -58,7 +62,8 @@ class _OrdersChatScreenState extends State<OrdersChatScreen> {
 
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection("conversations")
-          .where("ownerID", isEqualTo: "${FirebaseAuth.instance.currentUser.uid}")
+          .where("ownerID",
+              isEqualTo: "${FirebaseAuth.instance.currentUser.uid}")
           .where("receiverID", isEqualTo: "$receiverID")
           .get();
 

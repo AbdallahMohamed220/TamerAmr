@@ -148,7 +148,7 @@ class OrderOffersItems extends StatelessWidget {
         onTap: () async {
           // String loginUseremail =
           //     Provider.of<Users>(context, listen: false).loginUseremail;
-
+          print(delveryOrderemail);
           // List<String> users = [loginUseremail, delveryOrderemail];
           // String chatRoomId = Provider.of<Users>(context, listen: false).uid;
 
@@ -172,6 +172,7 @@ class OrderOffersItems extends StatelessWidget {
                 price: price,
                 points: points,
                 createdAt: createdAt,
+                deleveryEmail: delveryOrderemail,
               ),
             ),
           );

@@ -77,7 +77,7 @@ class _OrdersDescriptionScreenState extends State<OrdersDescriptionScreen> {
     }
   }
 
-  String mapPreview;
+  String mapPreview = "";
 
   Future<void> _getCurrentUserLocation() async {
     try {

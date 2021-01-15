@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:badges/badges.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
@@ -15,6 +14,7 @@ import 'package:tamer_amr/screens/order_chat/component/messages_types_components
 import 'package:tamer_amr/screens/order_chat/component/messages_types_components/mine/mine_text_message_widget.dart';
 import 'package:tamer_amr/screens/order_chat/component/messages_types_components/other/other_image_message_widget.dart';
 import 'package:tamer_amr/screens/order_chat/component/messages_types_components/other/other_text_message_widget.dart';
+import 'package:tamer_amr/screens/checked_user_login/check_user_login.dart';
 
 // ignore: must_be_immutable
 class UserChatScreen extends StatefulWidget {
@@ -103,7 +103,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                       Column(
                         children: [
                           Container(
-                            height: 145,
+                            height: deviceWidth * 0.2,
                             alignment: Alignment.bottomCenter,
                             decoration: BoxDecoration(
                               color: Color(0xff186A8C),
@@ -137,15 +137,18 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                   Container(
                                     margin: EdgeInsets.only(right: 15, top: 50),
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Text(
                                           widget.name,
                                           style: GoogleFonts.cairo(
                                             fontSize: 23,
                                             fontWeight: FontWeight.w600,
-                                            color: Theme.of(context).accentColor,
+                                            color:
+                                                Theme.of(context).accentColor,
                                           ),
                                         ),
                                       ],
@@ -169,7 +172,8 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                             'assets/icons/time-left.png',
                                             width: 18,
                                             height: 18,
-                                            color: Theme.of(context).accentColor,
+                                            color:
+                                                Theme.of(context).accentColor,
                                           ),
                                         ),
                                         Text(
@@ -177,7 +181,8 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                           style: GoogleFonts.cairo(
                                             fontSize: 22,
                                             fontWeight: FontWeight.w600,
-                                            color: Theme.of(context).accentColor,
+                                            color:
+                                                Theme.of(context).accentColor,
                                           ),
                                         ),
                                       ],
@@ -187,139 +192,141 @@ class _UserChatScreenState extends State<UserChatScreen> {
                               ),
                             ),
                           ),
-                          Container(
-                            width: deviceWidth * 0.9,
-                            height: 70.0,
-                            decoration: BoxDecoration(
-                              color: Color(0xff303030),
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(10),
-                                bottomRight: Radius.circular(10),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Container(
-                                  alignment: Alignment.center,
-                                  width: deviceWidth * 0.2,
-                                  height: deviceWidth * 0.07,
-                                  decoration: BoxDecoration(
-                                    color: Colors.green,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    "موافق",
-                                    style: GoogleFonts.cairo(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w600,
-                                      color: Theme.of(context).accentColor,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                Text(
-                                  "هل توافق على قبول العرض المقدم ؟",
-                                  style: GoogleFonts.cairo(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Theme.of(context).accentColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            width: deviceWidth * 0.9,
-                            height: 70.0,
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(10),
-                                bottomRight: Radius.circular(10),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Container(
-                                  alignment: Alignment.center,
-                                  width: deviceWidth * 0.2,
-                                  height: deviceWidth * 0.07,
-                                  decoration: BoxDecoration(
-                                    color: Colors.green,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    "موافق",
-                                    style: GoogleFonts.cairo(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w600,
-                                      color: Theme.of(context).accentColor,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                Text(
-                                  "إعادة الطلب",
-                                  style: GoogleFonts.cairo(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: Theme.of(context).accentColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Container(
-                              width: deviceWidth * 0.9,
-                              height: 70.0,
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(10),
-                                  bottomRight: Radius.circular(10),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Container(
-                                    alignment: Alignment.center,
-                                    width: deviceWidth * 0.2,
-                                    height: deviceWidth * 0.07,
-                                    decoration: BoxDecoration(
-                                      color: Colors.green,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      "موافق",
-                                      style: GoogleFonts.cairo(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w600,
-                                        color: Theme.of(context).accentColor,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    " تم التسديد",
-                                    style: GoogleFonts.cairo(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      color: Theme.of(context).accentColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                          // Container(
+                          //   width: deviceWidth * 0.9,
+                          //   height: 70.0,
+                          //   decoration: BoxDecoration(
+                          //     color: Color(0xff303030),
+                          //     borderRadius: BorderRadius.only(
+                          //       bottomLeft: Radius.circular(10),
+                          //       bottomRight: Radius.circular(10),
+                          //     ),
+                          //   ),
+                          //   child: Row(
+                          //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          //     children: [
+                          //       Container(
+                          //         alignment: Alignment.center,
+                          //         width: deviceWidth * 0.2,
+                          //         height: deviceWidth * 0.07,
+                          //         decoration: BoxDecoration(
+                          //           color: Colors.green,
+                          //           borderRadius: BorderRadius.circular(20),
+                          //         ),
+                          //         child: Text(
+                          //           "موافق",
+                          //           style: GoogleFonts.cairo(
+                          //             fontSize: 17,
+                          //             fontWeight: FontWeight.w600,
+                          //             color: Theme.of(context).accentColor,
+                          //           ),
+                          //         ),
+                          //       ),
+                          //       SizedBox(width: 10),
+                          //       Text(
+                          //         "هل توافق على قبول العرض المقدم ؟",
+                          //         style: GoogleFonts.cairo(
+                          //           fontSize: 15,
+                          //           fontWeight: FontWeight.w600,
+                          //           color: Theme.of(context).accentColor,
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
+                          // Container(
+                          //   width: deviceWidth * 0.9,
+                          //   height: 70.0,
+                          //   decoration: BoxDecoration(
+                          //     color: Colors.blue,
+                          //     borderRadius: BorderRadius.only(
+                          //       bottomLeft: Radius.circular(10),
+                          //       bottomRight: Radius.circular(10),
+                          //     ),
+                          //   ),
+                          //   child: Row(
+                          //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          //     children: [
+                          //       Container(
+                          //         alignment: Alignment.center,
+                          //         width: deviceWidth * 0.2,
+                          //         height: deviceWidth * 0.07,
+                          //         decoration: BoxDecoration(
+                          //           color: Colors.green,
+                          //           borderRadius: BorderRadius.circular(20),
+                          //         ),
+                          //         child: Text(
+                          //           "موافق",
+                          //           style: GoogleFonts.cairo(
+                          //             fontSize: 17,
+                          //             fontWeight: FontWeight.w600,
+                          //             color: Theme.of(context).accentColor,
+                          //           ),
+                          //         ),
+                          //       ),
+                          //       SizedBox(width: 10),
+                          //       Text(
+                          //         "إعادة الطلب",
+                          //         style: GoogleFonts.cairo(
+                          //           fontSize: 18,
+                          //           fontWeight: FontWeight.w600,
+                          //           color: Theme.of(context).accentColor,
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
+                          // Padding(
+                          //   padding: const EdgeInsets.only(top: 8.0),
+                          //   child: Container(
+                          //     width: deviceWidth * 0.9,
+                          //     height: 70.0,
+                          //     decoration: BoxDecoration(
+                          //       color: Colors.green,
+                          //       borderRadius: BorderRadius.only(
+                          //         bottomLeft: Radius.circular(10),
+                          //         bottomRight: Radius.circular(10),
+                          //       ),
+                          //     ),
+                          //     child: Row(
+                          //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          //       children: [
+                          //         Container(
+                          //           alignment: Alignment.center,
+                          //           width: deviceWidth * 0.2,
+                          //           height: deviceWidth * 0.07,
+                          //           decoration: BoxDecoration(
+                          //             color: Colors.green,
+                          //             borderRadius: BorderRadius.circular(20),
+                          //           ),
+                          //           child: Text(
+                          //             "موافق",
+                          //             style: GoogleFonts.cairo(
+                          //               fontSize: 17,
+                          //               fontWeight: FontWeight.w600,
+                          //               color: Theme.of(context).accentColor,
+                          //             ),
+                          //           ),
+                          //         ),
+                          //         SizedBox(width: 10),
+                          //         Text(
+                          //           " تم التسديد",
+                          //           style: GoogleFonts.cairo(
+                          //             fontSize: 18,
+                          //             fontWeight: FontWeight.w600,
+                          //             color: Theme.of(context).accentColor,
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
                       OtherTextMessageWidget(
-                        message: Message(content: "العرض المقدم لتوصيل الطلب ${widget.price} ريال\n"),
+                        message: Message(
+                            content:
+                                "العرض المقدم لتوصيل الطلب ${widget.price} ريال\n"),
                       ),
                       SizedBox(height: 20.0),
                       StreamBuilder(
@@ -347,10 +354,12 @@ class _UserChatScreenState extends State<UserChatScreen> {
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 12.0),
                                 child: Column(
-                                  children: snapshot.data.docs.map<Widget>((doc) {
+                                  children:
+                                      snapshot.data.docs.map<Widget>((doc) {
                                     Message message = Message.fromDocument(doc);
 
-                                    if (message.senderID == FirebaseAuth.instance.currentUser.uid) {
+                                    if (message.senderID ==
+                                        FirebaseAuth.instance.currentUser.uid) {
                                       switch (message.messageType) {
                                         case MessageType.text:
                                           return MineTextMessageWidget(
@@ -389,7 +398,9 @@ class _UserChatScreenState extends State<UserChatScreen> {
                   height: 75,
                   child: ClipRRect(
                     clipBehavior: Clip.antiAlias,
-                    borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20.0), bottomRight: Radius.circular(20.0)),
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(20.0),
+                        bottomRight: Radius.circular(20.0)),
                     child: AppBar(
                       backgroundColor: Color(0xff2190c2),
                       centerTitle: true,
@@ -421,7 +432,8 @@ class _UserChatScreenState extends State<UserChatScreen> {
                               SizedBox(width: 45),
                               InkWell(
                                 onTap: () {
-                                  Navigator.of(context).pushReplacementNamed(NotificationScreen.routeName);
+                                  Navigator.of(context).pushReplacementNamed(
+                                      NotificationScreen.routeName);
                                 },
                                 child: Badge(
                                   badgeContent: Text(
@@ -486,9 +498,11 @@ class _UserChatScreenState extends State<UserChatScreen> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
+                        contentPadding: EdgeInsets.only(
+                            left: 15, bottom: 11, top: 11, right: 15),
                         enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey[400], width: 0.5),
+                          borderSide:
+                              BorderSide(color: Colors.grey[400], width: 0.5),
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         border: InputBorder.none,
@@ -546,7 +560,10 @@ class _UserChatScreenState extends State<UserChatScreen> {
       Conversation newConversation = Conversation(
         ownerID: "${FirebaseAuth.instance.currentUser.uid}",
         receiverID: "${widget.receiverID}",
-        recipients: ["${FirebaseAuth.instance.currentUser.uid}", "${widget.receiverID}"],
+        recipients: [
+          "${FirebaseAuth.instance.currentUser.uid}",
+          "${widget.receiverID}"
+        ],
         lastMessageTime: Timestamp.now(),
         messageType: message.messageType,
         lastMessage: message.content,
@@ -554,7 +571,8 @@ class _UserChatScreenState extends State<UserChatScreen> {
         unseenOwnerCount: 0,
       );
 
-      DocumentReference docConversation = FirebaseFirestore.instance.collection("conversations").doc();
+      DocumentReference docConversation =
+          FirebaseFirestore.instance.collection("conversations").doc();
 
       newConversation.id = docConversation.id;
 
@@ -567,10 +585,15 @@ class _UserChatScreenState extends State<UserChatScreen> {
 
     if (_newMessageController.text.isNotEmpty) {
       FirebaseFirestore.instance.runTransaction((transaction) async {
-        DocumentReference docMessage =
-            FirebaseFirestore.instance.collection("conversations").doc("${_conversation.id}").collection("messages").doc();
+        DocumentReference docMessage = FirebaseFirestore.instance
+            .collection("conversations")
+            .doc("${_conversation.id}")
+            .collection("messages")
+            .doc();
 
-        DocumentReference docConversation = FirebaseFirestore.instance.collection("conversations").doc("${_conversation.id}");
+        DocumentReference docConversation = FirebaseFirestore.instance
+            .collection("conversations")
+            .doc("${_conversation.id}");
 
         String unSeenFieldName;
         if (_conversation.ownerID != FirebaseAuth.instance.currentUser.uid)
@@ -580,7 +603,8 @@ class _UserChatScreenState extends State<UserChatScreen> {
 
         transaction.set(docMessage, message.toJSON()).update(docConversation, {
           "lastMessageTime": Timestamp.now(),
-          "messageType": message.messageType.toString().replaceAll("MessageType.", ""),
+          "messageType":
+              message.messageType.toString().replaceAll("MessageType.", ""),
           "lastMessage": message.content,
           "$unSeenFieldName": FieldValue.increment(1),
         });
@@ -607,7 +631,9 @@ class _UserChatScreenState extends State<UserChatScreen> {
           .collection("messages")
           .doc("${message.id}");
 
-      DocumentReference docConversation = FirebaseFirestore.instance.collection("conversations").doc("${_conversation.id}");
+      DocumentReference docConversation = FirebaseFirestore.instance
+          .collection("conversations")
+          .doc("${_conversation.id}");
 
       String unSeenFieldName;
       if (_conversation.ownerID == FirebaseAuth.instance.currentUser.uid)
@@ -646,7 +672,9 @@ class _UserChatScreenState extends State<UserChatScreen> {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  CircularProgressIndicator(valueColor: new AlwaysStoppedAnimation<Color>(Colors.blue),),
+                  CircularProgressIndicator(
+                    valueColor: new AlwaysStoppedAnimation<Color>(Colors.blue),
+                  ),
                   SizedBox(height: 20.0),
                   Text(
                     "جاري رفع الصورة",
@@ -674,7 +702,10 @@ class _UserChatScreenState extends State<UserChatScreen> {
         Conversation newConversation = Conversation(
           ownerID: "${FirebaseAuth.instance.currentUser.uid}",
           receiverID: "${widget.receiverID}",
-          recipients: ["${FirebaseAuth.instance.currentUser.uid}", "${widget.receiverID}"],
+          recipients: [
+            "${FirebaseAuth.instance.currentUser.uid}",
+            "${widget.receiverID}"
+          ],
           lastMessageTime: Timestamp.now(),
           messageType: message.messageType,
           lastMessage: message.content,
@@ -682,7 +713,8 @@ class _UserChatScreenState extends State<UserChatScreen> {
           unseenOwnerCount: 0,
         );
 
-        DocumentReference docConversation = FirebaseFirestore.instance.collection("conversations").doc();
+        DocumentReference docConversation =
+            FirebaseFirestore.instance.collection("conversations").doc();
 
         newConversation.id = docConversation.id;
 
@@ -694,10 +726,15 @@ class _UserChatScreenState extends State<UserChatScreen> {
       }
 
       FirebaseFirestore.instance.runTransaction((transaction) async {
-        DocumentReference docMessage =
-        FirebaseFirestore.instance.collection("conversations").doc("${_conversation.id}").collection("messages").doc();
+        DocumentReference docMessage = FirebaseFirestore.instance
+            .collection("conversations")
+            .doc("${_conversation.id}")
+            .collection("messages")
+            .doc();
 
-        DocumentReference docConversation = FirebaseFirestore.instance.collection("conversations").doc("${_conversation.id}");
+        DocumentReference docConversation = FirebaseFirestore.instance
+            .collection("conversations")
+            .doc("${_conversation.id}");
 
         String unSeenFieldName;
         if (_conversation.ownerID != FirebaseAuth.instance.currentUser.uid)
@@ -707,7 +744,8 @@ class _UserChatScreenState extends State<UserChatScreen> {
 
         transaction.set(docMessage, message.toJSON()).update(docConversation, {
           "lastMessageTime": Timestamp.now(),
-          "messageType": message.messageType.toString().replaceAll("MessageType.", ""),
+          "messageType":
+              message.messageType.toString().replaceAll("MessageType.", ""),
           "lastMessage": message.content,
           "$unSeenFieldName": FieldValue.increment(1),
         });
@@ -732,7 +770,9 @@ class _UserChatScreenState extends State<UserChatScreen> {
     TaskSnapshot storageTaskSnapshot;
 
     timestampId = DateTime.now().millisecondsSinceEpoch.toString();
-    reference = FirebaseStorage.instance.ref().child("conversations/${_conversation.id}/$timestampId");
+    reference = FirebaseStorage.instance
+        .ref()
+        .child("conversations/${_conversation.id}/$timestampId");
     uploadTask = reference.putFile(File(file.path));
     storageTaskSnapshot = await uploadTask;
     String imageUrl = await storageTaskSnapshot.ref.getDownloadURL();

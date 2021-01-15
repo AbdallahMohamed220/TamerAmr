@@ -262,19 +262,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         textAlign: TextAlign.right,
                       ),
                       Center(
-                        child: Expanded(
-                          child: FittedBox(
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 5.0),
-                              child: Text(
-                                senderAddress,
-                                style: GoogleFonts.cairo(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.red,
-                                ),
-                                textAlign: TextAlign.center,
+                        child: FittedBox(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 5.0),
+                            child: Text(
+                              senderAddress,
+                              style: GoogleFonts.cairo(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.red,
                               ),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),
@@ -313,19 +311,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         textAlign: TextAlign.right,
                       ),
                       Center(
-                        child: Expanded(
-                          child: FittedBox(
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 5.0),
-                              child: Text(
-                                receiveAddress,
-                                style: GoogleFonts.cairo(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.red,
-                                ),
-                                textAlign: TextAlign.center,
+                        child: FittedBox(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 5.0),
+                            child: Text(
+                              receiveAddress,
+                              style: GoogleFonts.cairo(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.red,
                               ),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),
@@ -374,7 +370,6 @@ class _HomeScreenState extends State<HomeScreen> {
               left: deviceWidth * 0.25,
               child: InkWell(
                 onTap: () {
-                  //Navigator.of(context).pushNamed(AddOrderScreen.routeName);
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (BuildContext context) => AddOrderScreen(
